@@ -1,0 +1,51 @@
+format_version: 11
+
+pipelines:
+  hello-world-pipeline:
+    group: defaultGroup
+    label_template: "${COUNT}"
+    lock_behavior: none
+    materials:
+      git:
+        url: https://github.com/htetgit/Hello-World-App.git
+        branch: main
+    stages:
+      - name: Build
+        fetch_materials: true
+        clean_working_dir: false
+        jobs:
+          - name: Build
+            timeout: 0
+            environment_variables:
+              DOCKER_HOST: "tcp://localhost:2375"
+            tasks:
+              - exec:
+                  command: go
+                  arguments:
+                    - build
+                    - -o
+                    - main
+                  run_if: passed
+              - exec:
+                  command: docker
+                  arguments:
+                    - build
+                    - -t
+                    - hello-world:latest
+                    - .
+                  run_if: passed
+      - name: Deploy
+        fetch_materials: false
+        clean_working_dir: false
+        jobs:
+          - name: Deploy
+            timeout: 0
+            environment_variables:
+              DOCKER_HOST: "tcp://localhost:2375"
+            tasks:
+              - exec:
+                  command: cmd
+                  arguments:
+                    - /c
+                    - docker run -d -p 8080:8080 hello-world:latest
+                  run_if: passed

@@ -1,8 +1,9 @@
+
 format_version: 11
 
 pipelines:
   hello-world-pipeline:
-    group: defaultGroup
+    group: myFirstpipeline
     label_template: "${COUNT}"
     lock_behavior: none
     materials:
@@ -47,6 +48,5 @@ pipelines:
                   command: cmd
                   arguments:
                     - /c
-                    - |
-                      docker run -d -p 8080:8080 hello-world:latest
+                    - docker run -d -p 8080:8080 hello-world:latest
                   run_if: passed
